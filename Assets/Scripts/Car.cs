@@ -3,82 +3,79 @@ using System.Collections.Generic;
 
 public class Car : MonoBehaviour {
 
-	[SerializeField]
-	bool IsPlayerControlled = false;
+	[SerializeField] private bool IsPlayerControlled = false;
 
 	[SerializeField]
 	[Range(0f, 1f)]
-	float CGHeight = 0.55f;
+    private float CGHeight = 0.55f;
 
 	[SerializeField]
 	[Range(0f, 2f)]
-	float InertiaScale = 1f;
+    private float InertiaScale = 1f;
 
-	[SerializeField]
-	float BrakePower = 12000;
+	[SerializeField] private float BrakePower = 12000;
 
-	[SerializeField]
-	float EBrakePower = 5000;
-
-	[SerializeField]
-	[Range(0f, 1f)]
-	float WeightTransfer = 0.35f;
+	[SerializeField] private float EBrakePower = 5000;
 
 	[SerializeField]
 	[Range(0f, 1f)]
-	float MaxSteerAngle = 0.75f;
-
-	[SerializeField]
-	[Range(0f, 20f)]
-	float CornerStiffnessFront = 5.0f;
-
-	[SerializeField]
-	[Range(0f, 20f)]
-	float CornerStiffnessRear = 5.2f;
-
-	[SerializeField]
-	[Range(0f, 20f)]
-	float AirResistance = 2.5f;
-
-	[SerializeField]
-	[Range(0f, 20f)]
-	float RollingResistance = 8.0f;
+    private float WeightTransfer = 0.35f;
 
 	[SerializeField]
 	[Range(0f, 1f)]
-	float EBrakeGripRatioFront = 0.9f;
+    private float MaxSteerAngle = 0.75f;
 
 	[SerializeField]
-	[Range(0f, 5f)]
-	float TotalTireGripFront = 2.5f;
+	[Range(0f, 20f)]
+    private float CornerStiffnessFront = 5.0f;
+
+	[SerializeField]
+	[Range(0f, 20f)]
+    private float CornerStiffnessRear = 5.2f;
+
+	[SerializeField]
+	[Range(0f, 20f)]
+    private float AirResistance = 2.5f;
+
+	[SerializeField]
+	[Range(0f, 20f)]
+    private float RollingResistance = 8.0f;
 
 	[SerializeField]
 	[Range(0f, 1f)]
-	float EBrakeGripRatioRear = 0.4f;
+    private float EBrakeGripRatioFront = 0.9f;
 
 	[SerializeField]
 	[Range(0f, 5f)]
-	float TotalTireGripRear = 2.5f;
+    private float TotalTireGripFront = 2.5f;
+
+	[SerializeField]
+	[Range(0f, 1f)]
+    private float EBrakeGripRatioRear = 0.4f;
 
 	[SerializeField]
 	[Range(0f, 5f)]
-	float SteerSpeed = 2.5f;
+    private float TotalTireGripRear = 2.5f;
 
 	[SerializeField]
 	[Range(0f, 5f)]
-	float SteerAdjustSpeed = 1f;
+    private float SteerSpeed = 2.5f;
+
+	[SerializeField]
+	[Range(0f, 5f)]
+    private float SteerAdjustSpeed = 1f;
 
 	[SerializeField]
 	[Range(0f, 1000f)]
-	float SpeedSteerCorrection = 300f;
+    private float SpeedSteerCorrection = 300f;
 
 	[SerializeField]
 	[Range(0f, 20f)]
-	float SpeedTurningStability = 10f;
+    private float SpeedTurningStability = 10f;
 
 	[SerializeField]
 	[Range(0f, 10f)]
-	float AxleDistanceCorrection = 2f;
+    private float AxleDistanceCorrection = 2f;
 
 	public float SpeedKilometersPerHour {
 		get {
@@ -87,39 +84,36 @@ public class Car : MonoBehaviour {
 	}
 
 	// Variables that get initialized via code
-	float Inertia = 1;
-	float WheelBase = 1;
-	float TrackWidth = 1;
+    private float Inertia    = 1;
+    private float WheelBase  = 1;
+    private float TrackWidth = 1;
 
 	// Private vars
-	float HeadingAngle;
-	float AbsoluteVelocity;
-	float AngularVelocity;
-	float SteerDirection;
-	float SteerAngle;
+    private float HeadingAngle;
+    private float Speed;
+    private float AngularVelocity;
+    private float SteerDirection;
+    private float SteerAngle;
 
-	Vector3 Velocity;
-	Vector3 Acceleration;
-	Vector3 LocalVelocity;
-	Vector3 LocalAcceleration;
+    private Vector3 Velocity;
+    private Vector3 Acceleration;
+    private Vector3 LocalVelocity;
+    private Vector3 LocalAcceleration;
 
-	float Throttle;
-	float Brake;
-	float EBrake;
+    private float Throttle;
+    private float Brake;
+    private float EBrake;
 
-	Rigidbody Rigidbody;
+    private Rigidbody Rigidbody;
 
-	Axle AxleFront;
-	Axle AxleRear;
-	Engine Engine;
+    private Axle   AxleFront;
+    private Axle   AxleRear;
+    private Engine Engine;
 
-	GameObject CenterOfGravity;
-	GameObject CameraView;
+    private GameObject CenterOfGravity;
 
-	void Awake() {
-
-		CameraView = GameObject.Find ("CameraView").gameObject;
-
+    private void Awake()
+    {
 		Rigidbody = GetComponent<Rigidbody> ();
 		CenterOfGravity = transform.Find ("CenterOfGravity").gameObject;
 
@@ -128,13 +122,13 @@ public class Car : MonoBehaviour {
 
 		Engine = transform.Find ("Engine").GetComponent<Engine>();
 
-		Init ();
+		Init();
 	}
 
-	void Init() {
-
+    private void Init()
+    {
 		Velocity = Vector3.zero;
-		AbsoluteVelocity = 0;
+		Speed = 0;
 
 		// Dimensions
 		AxleFront.DistanceToCG = Vector3.Distance(CenterOfGravity.transform.position, AxleFront.transform.position);
@@ -147,48 +141,38 @@ public class Car : MonoBehaviour {
 		Inertia = Rigidbody.mass * InertiaScale;
 
 		// Set starting angle of car
-		// Rigidbody.rotation = transform.rotation.eulerAngles.y;
-		// HeadingAngle = Rigidbody.rotation * Mathf.Deg2Rad;
 		HeadingAngle = transform.rotation.eulerAngles.y * Mathf.Deg2Rad;
 	}
 
-	void Start() {
-		
+    private void Start()
+    {
 		AxleFront.Init (Rigidbody, WheelBase);
 		AxleRear.Init (Rigidbody, WheelBase);
 
 		TrackWidth = Vector3.Distance(AxleRear.TireLeft.transform.position, AxleRear.TireRight.transform.position);
 	}
 
-	void Update() {
-
-		if (IsPlayerControlled) {
-
+    private void Update()
+    {
+		if (IsPlayerControlled)
+        {
 			// Handle Input
 			Throttle = 0;
 			Brake = 0;
 			EBrake = 0;
 
-			if (Input.GetKey (KeyCode.UpArrow)) {
-				Throttle = 1;
-			} else if (Input.GetKey (KeyCode.DownArrow)) { 
-				//Brake = 1;
-				Throttle = -1;
-			} 
-			if(Input.GetKey(KeyCode.Space))	{
-				EBrake = 1;
-			}
-
 			float steerInput = 0;
+
+			if (Input.GetKey(KeyCode.Space)) EBrake = 1;
+
+			     if (Input.GetKey (KeyCode.UpArrow))   Throttle = +1;
+		    else if (Input.GetKey (KeyCode.DownArrow)) Throttle = -1; // Brake = 1;
 
 			     if (Input.GetKey(KeyCode.LeftArrow))  steerInput = -1;
 			else if (Input.GetKey(KeyCode.RightArrow)) steerInput = +1;
 
-			if (Input.GetKeyDown (KeyCode.A)) {
-				Engine.ShiftUp();
-			} else if (Input.GetKeyDown (KeyCode.Z)) {
-				Engine.ShiftDown();
-			}
+			     if (Input.GetKeyDown (KeyCode.A)) Engine.ShiftUp();
+            else if (Input.GetKeyDown (KeyCode.Z)) Engine.ShiftDown();
 
 			// Apply filters to our steer direction
 			SteerDirection = SmoothSteering (steerInput);
@@ -196,36 +180,43 @@ public class Car : MonoBehaviour {
 
 			// Calculate the current angle the tires are pointing
 			SteerAngle = SteerDirection * MaxSteerAngle;
+            
+            var rotation = Quaternion.Euler(0, Mathf.Rad2Deg * SteerAngle, 0);
 
-			// Set front axle tires rotation
-			AxleFront.TireRight.transform.localRotation = Quaternion.Euler(0, Mathf.Rad2Deg * SteerAngle, 0);
-			AxleFront.TireLeft.transform.localRotation = Quaternion.Euler(0, Mathf.Rad2Deg * SteerAngle, 0);
+            // Set front axle tires rotation
+            AxleFront.TireRight.transform.localRotation = rotation;
+			AxleFront.TireLeft.transform.localRotation  = rotation;
 		}			
 
 
 		// Calculate weight center of four tires
 		// This is just to draw that red dot over the car to indicate what tires have the most weight
-		Vector3 pos = Vector3.zero;
+		var pos = Vector3.zero;
 
-		if (LocalAcceleration.magnitude > 1f) {
+		if (LocalAcceleration.magnitude > 1f)
+        {
+			var wfl = Mathf.Max (0, (AxleFront.TireLeft.ActiveWeight - AxleFront.TireLeft.RestingWeight));
+			var wfr = Mathf.Max (0, (AxleFront.TireRight.ActiveWeight - AxleFront.TireRight.RestingWeight));
+			var wrl = Mathf.Max (0, (AxleRear.TireLeft.ActiveWeight - AxleRear.TireLeft.RestingWeight));
+			var wrr = Mathf.Max (0, (AxleRear.TireRight.ActiveWeight - AxleRear.TireRight.RestingWeight));
 
-			float wfl = Mathf.Max (0, (AxleFront.TireLeft.ActiveWeight - AxleFront.TireLeft.RestingWeight));
-			float wfr = Mathf.Max (0, (AxleFront.TireRight.ActiveWeight - AxleFront.TireRight.RestingWeight));
-			float wrl = Mathf.Max (0, (AxleRear.TireLeft.ActiveWeight - AxleRear.TireLeft.RestingWeight));
-			float wrr = Mathf.Max (0, (AxleRear.TireRight.ActiveWeight - AxleRear.TireRight.RestingWeight));
-
-			pos = (AxleFront.TireLeft.transform.localPosition) * wfl +
-				(AxleFront.TireRight.transform.localPosition) * wfr +
-			    (AxleRear.TireLeft.transform.localPosition) * wrl +
-				(AxleRear.TireRight.transform.localPosition) * wrr;
+			pos = (AxleFront.TireLeft.LocalPosition) * wfl +
+				(AxleFront.TireRight.LocalPosition)  * wfr +
+			    (AxleRear.TireLeft.LocalPosition)    * wrl +
+				(AxleRear.TireRight.LocalPosition)   * wrr;
 		
-			float weightTotal = wfl + wfr + wrl + wrr;
+			var weightTotal = wfl + wfr + wrl + wrr;
 
-			if (weightTotal > 0) {
+			if (weightTotal > 0)
+            {
 				pos /= weightTotal;
 				pos.Normalize ();
 				pos.x = Mathf.Clamp (pos.x, -0.6f, 0.6f);
-			} else {
+
+                Debug.Log(pos);
+            }
+            else
+            {
 				pos = Vector3.zero;
 			}
 		}
@@ -234,45 +225,42 @@ public class Car : MonoBehaviour {
 		CenterOfGravity.transform.localPosition = Vector3.Lerp (CenterOfGravity.transform.localPosition, pos, 0.1f);
 
 		// Skidmarks
-		if (Mathf.Abs (LocalAcceleration.y) > 18 || EBrake == 1) {
+		if (Mathf.Abs (LocalAcceleration.y) > 18 || EBrake == 1)
+        {
 			AxleRear.TireRight.SetTrailActive (true);
 			AxleRear.TireLeft.SetTrailActive (true);
-		} else {
+		}
+        else
+        {
 			AxleRear.TireRight.SetTrailActive (false);
 			AxleRear.TireLeft.SetTrailActive (false);
 		}
 
 		// Automatic transmission
 		Engine.UpdateAutomaticTransmission (Rigidbody);
+    }
 
-        // Update camera
-        if (IsPlayerControlled)
-        {
-            CameraView.transform.position = this.transform.position;
-        }
-	}
-			
-	void FixedUpdate() {
-
+    private void FixedUpdate()
+    {
 		// Update from rigidbody to retain collision responses
 		Velocity = Rigidbody.velocity;
 		// HeadingAngle = (Rigidbody.rotation + 90) * Mathf.Deg2Rad;
 		HeadingAngle = transform.rotation.eulerAngles.y * Mathf.Deg2Rad;
 
-		float sin = Mathf.Sin(HeadingAngle);
-		float cos = Mathf.Cos(HeadingAngle);
+		var sin = Mathf.Sin(HeadingAngle);
+		var cos = Mathf.Cos(HeadingAngle);
 
 		// Get local velocity
 		LocalVelocity.z = cos * Velocity.z + sin * Velocity.x;
 		LocalVelocity.x = cos * Velocity.x - sin * Velocity.z;
 
 		// Weight transfer
-		float transferLongitudinal = WeightTransfer * LocalAcceleration.z * CGHeight / WheelBase;
-		float transferLateral = WeightTransfer * LocalAcceleration.x * CGHeight / TrackWidth * 20;		//exagerate the weight transfer on the y-axis
+		var transferLongitudinal = WeightTransfer * LocalAcceleration.z * CGHeight / WheelBase;
+		var transferLateral = WeightTransfer * LocalAcceleration.x * CGHeight / TrackWidth * 20;		//exagerate the weight transfer on the y-axis
 
 		// Weight on each axle
-		float weightFront = Rigidbody.mass * (AxleFront.WeightRatio * -Physics.gravity.y - transferLongitudinal);
-		float weightRear = Rigidbody.mass * (AxleRear.WeightRatio * -Physics.gravity.y + transferLongitudinal);
+		var weightFront = Rigidbody.mass * (AxleFront.WeightRatio * -Physics.gravity.y - transferLongitudinal);
+		var weightRear = Rigidbody.mass * (AxleRear.WeightRatio * -Physics.gravity.y + transferLongitudinal);
 
 		// Weight on each tire
 		AxleFront.TireLeft.ActiveWeight = weightFront - transferLateral;
@@ -291,8 +279,8 @@ public class Car : MonoBehaviour {
 		AxleRear.SlipAngle = Mathf.Atan2(LocalVelocity.x + AxleRear.AngularVelocity,  Mathf.Abs(LocalVelocity.z));
 
 		// Brake and Throttle power
-		float activeBrake = Mathf.Min(Brake * BrakePower + EBrake * EBrakePower, BrakePower);
-		float activeThrottle = (Throttle * Engine.GetTorque (Rigidbody)) * (Engine.GearRatio * Engine.EffectiveGearRatio);
+		var activeBrake = Mathf.Min(Brake * BrakePower + EBrake * EBrakePower, BrakePower);
+		var activeThrottle = (Throttle * Engine.GetTorque (Rigidbody)) * (Engine.GearRatio * Engine.EffectiveGearRatio);
 
 		// Torque of each tire (rear wheel drive)
 		AxleRear.TireLeft.Torque = activeThrottle / AxleRear.TireLeft.Radius;
@@ -310,18 +298,18 @@ public class Car : MonoBehaviour {
 		AxleRear.TireRight.FrictionForce = Mathf.Clamp(-CornerStiffnessRear * AxleRear.SlipAngle, -AxleRear.TireRight.Grip, AxleRear.TireRight.Grip) * AxleRear.TireRight.ActiveWeight;
 
 	 	// Forces
-		float tractionForceZ = AxleRear.Torque - activeBrake * Mathf.Sign(LocalVelocity.z);
+		var tractionForceZ = AxleRear.Torque - activeBrake * Mathf.Sign(LocalVelocity.z);
 		float tractionForceX = 0;
 
-        float dragForceZ = -RollingResistance * LocalVelocity.z - AirResistance * LocalVelocity.z * Mathf.Abs(LocalVelocity.z);
-		float dragForceX = -RollingResistance * LocalVelocity.x - AirResistance * LocalVelocity.x * Mathf.Abs(LocalVelocity.x);
+        var dragForceZ = -RollingResistance * LocalVelocity.z - AirResistance * LocalVelocity.z * Mathf.Abs(LocalVelocity.z);
+		var dragForceX = -RollingResistance * LocalVelocity.x - AirResistance * LocalVelocity.x * Mathf.Abs(LocalVelocity.x);
 
-		float totalForceZ = dragForceZ + tractionForceZ;
-		float totalForceX = dragForceX + tractionForceX + Mathf.Cos (SteerAngle) * AxleFront.FrictionForce + AxleRear.FrictionForce;
+		var totalForceZ = dragForceZ + tractionForceZ;
+		var totalForceX = dragForceX + tractionForceX + Mathf.Cos (SteerAngle) * AxleFront.FrictionForce + AxleRear.FrictionForce;
 
 		//adjust Y force so it levels out the car heading at high speeds
-		if (AbsoluteVelocity > 10) {
-			totalForceX *= (AbsoluteVelocity + 1) / (21f - SpeedTurningStability);
+		if (Speed > 10) {
+			totalForceX *= (Speed + 1) / (21f - SpeedTurningStability);
 		}
 
 		// If we are not pressing gas, add artificial drag - helps with simulation stability
@@ -340,16 +328,16 @@ public class Car : MonoBehaviour {
 		Velocity.z += Acceleration.z * Time.deltaTime;
 		Velocity.x += Acceleration.x * Time.deltaTime;
 
-		AbsoluteVelocity = Velocity.magnitude;
+		Speed = Velocity.magnitude;
 
 		// Angular torque of car
-		float angularTorque = (AxleFront.FrictionForce * AxleFront.DistanceToCG) - (AxleRear.FrictionForce * AxleRear.DistanceToCG);
+		var angularTorque = (AxleFront.FrictionForce * AxleFront.DistanceToCG) - (AxleRear.FrictionForce * AxleRear.DistanceToCG);
 
 		// Car will drift away at low speeds
-		if (AbsoluteVelocity < 0.5f && activeThrottle == 0)
+		if (Speed < 0.5f && activeThrottle == 0)
 		{
 			LocalAcceleration = Vector3.zero;
-			AbsoluteVelocity = 0;
+			Speed = 0;
 			Velocity = Vector3.zero;
 			angularTorque = 0;
 			AngularVelocity = 0;
@@ -363,20 +351,26 @@ public class Car : MonoBehaviour {
 		AngularVelocity += angularAcceleration * Time.deltaTime;
 
 		// Simulation likes to calculate high angular velocity at very low speeds - adjust for this
-		if (AbsoluteVelocity < 1 && Mathf.Abs (SteerAngle) < 0.05f) {
+		if (Speed < 1 && Mathf.Abs (SteerAngle) < 0.05f) {
 			AngularVelocity = 0;
 		} else if (SpeedKilometersPerHour < 0.75f) {
 			AngularVelocity = 0;
 		}
 
 		HeadingAngle += AngularVelocity * Time.deltaTime;
-		Rigidbody.velocity = Velocity;
+		
+        var oldVelocity = Rigidbody.velocity;
+        var newVelocity = new Vector3(Velocity.x, oldVelocity.y, Velocity.z);
 
-		// Rigidbody.MoveRotation (Mathf.Rad2Deg * HeadingAngle - 90);
-        Rigidbody.MoveRotation(Quaternion.AngleAxis(Mathf.Rad2Deg * HeadingAngle, Vector3.up));
+        var velocityDelta = newVelocity - oldVelocity;
+
+        var rotation = Quaternion.AngleAxis(Mathf.Rad2Deg * HeadingAngle, Vector3.up);
+
+        Rigidbody.AddForce(velocityDelta, ForceMode.VelocityChange);
+        Rigidbody.MoveRotation(rotation);
 	}
 
-	float SmoothSteering(float steerInput) {
+    private float SmoothSteering(float steerInput) {
 
 		float steer = 0;
 
@@ -396,13 +390,13 @@ public class Car : MonoBehaviour {
 		return steer;
 	}
 
-	float SpeedAdjustedSteering(float steerInput) {
-		float activeVelocity = Mathf.Min(AbsoluteVelocity, 250.0f);
-		float steer = steerInput * (1.0f - (AbsoluteVelocity / SpeedSteerCorrection));
+    private float SpeedAdjustedSteering(float steerInput) {
+		var activeVelocity = Mathf.Min(Speed, 250.0f);
+		var steer = steerInput * (1.0f - (Speed / SpeedSteerCorrection));
 		return steer;
 	}
 
-	void OnGUI (){
+    private void OnGUI () {
         if (IsPlayerControlled)
         {
             GUI.Label(new Rect(5, 5, 300, 20), "Speed: " + SpeedKilometersPerHour.ToString());

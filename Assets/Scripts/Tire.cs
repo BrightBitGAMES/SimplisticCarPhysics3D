@@ -11,9 +11,11 @@ public class Tire : MonoBehaviour {
 
 	public float Radius = 0.5f;
 
-	float TrailDuration = 5;
-	bool TrailActive;
-	GameObject Skidmark;
+    private float      TrailDuration = 5;
+    private bool       TrailActive;
+    private GameObject Skidmark;
+
+    public Vector3 LocalPosition => transform.parent.localPosition + transform.localPosition;
 
 	public void SetTrailActive(bool active)
     {

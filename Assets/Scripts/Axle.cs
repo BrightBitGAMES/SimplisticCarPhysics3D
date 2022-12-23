@@ -24,7 +24,7 @@ public class Axle : MonoBehaviour {
 	public Tire TireLeft { get; private set; }
 	public Tire TireRight { get; private set; }
 
-	void Awake() {
+    private void Awake() {
 		TireLeft = transform.Find ("TireLeft").GetComponent<Tire> ();
 		TireRight = transform.Find ("TireRight").GetComponent<Tire> ();
 	}
@@ -35,7 +35,7 @@ public class Axle : MonoBehaviour {
 		WeightRatio = DistanceToCG / wheelBase;
 
 		// Calculate resting weight of each Tire
-		float weight = rb.mass * (WeightRatio * -Physics2D.gravity.y);
+		var weight = rb.mass * (WeightRatio * -Physics2D.gravity.y);
 		TireLeft.RestingWeight = weight;
 		TireRight.RestingWeight = weight;
 	}

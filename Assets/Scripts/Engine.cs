@@ -3,11 +3,9 @@ using System.Collections;
 
 public class Engine : MonoBehaviour {
 	
-	[SerializeField]
-	int[] TorqueCurve = new int[8] { 100, 280, 325, 420, 460, 340, 300, 100 };
+	[SerializeField] private int[] TorqueCurve = new int[8] { 100, 280, 325, 420, 460, 340, 300, 100 };
 
-	[SerializeField]
-	float[] GearRatios = new float[] { 5.8f, 4.5f, 3.74f, 2.8f, 1.6f, 0.79f, 4.2f };
+	[SerializeField] private float[] GearRatios = new float[] { 5.8f, 4.5f, 3.74f, 2.8f, 1.6f, 0.79f, 4.2f };
 
 	public int CurrentGear { get; private set; }
 
@@ -58,7 +56,7 @@ public class Engine : MonoBehaviour {
 	}
 
 	public void UpdateAutomaticTransmission(Rigidbody rb) {
-		float rpm = GetRPM (rb);
+		var rpm = GetRPM (rb);
 
 		if (rpm > 6200) {
 			if (CurrentGear < 5)
