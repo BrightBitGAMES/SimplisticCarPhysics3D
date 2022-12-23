@@ -27,11 +27,11 @@ public class Engine : MonoBehaviour {
 		CurrentGear--;
 	}
 
-	public float GetTorque(Rigidbody2D rb) {
+	public float GetTorque(Rigidbody rb) {
 		return GetTorque(GetRPM (rb));
 	}
 
-	public float GetRPM(Rigidbody2D rb) {
+	public float GetRPM(Rigidbody rb) {
 		return rb.velocity.magnitude / (Mathf.PI * 2 / 60f) * (GearRatio * EffectiveGearRatio);
 	}
 
@@ -57,7 +57,7 @@ public class Engine : MonoBehaviour {
 
 	}
 
-	public void UpdateAutomaticTransmission(Rigidbody2D rb) {
+	public void UpdateAutomaticTransmission(Rigidbody rb) {
 		float rpm = GetRPM (rb);
 
 		if (rpm > 6200) {

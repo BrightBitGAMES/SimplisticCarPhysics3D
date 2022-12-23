@@ -29,7 +29,7 @@ public class Axle : MonoBehaviour {
 		TireRight = transform.Find ("TireRight").GetComponent<Tire> ();
 	}
 
-	public void Init(Rigidbody2D rb, float wheelBase) {
+	public void Init(Rigidbody rb, float wheelBase) {
 
 		// Weight distribution on each axle and tire
 		WeightRatio = DistanceToCG / wheelBase;
