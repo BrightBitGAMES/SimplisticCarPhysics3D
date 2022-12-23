@@ -1,18 +1,2 @@
-# CarSimulator
-A Top Down 2D Car Simulator For Unity
-
-![Screenshot](http://i.imgur.com/m2yvTgK.jpg)
-
-Try the demo: 
-
-http://www.jgallant.com/CarSim/
-
-
-Article that details all of the physics involved:
-
-http://www.asawicki.info/Mirror/Car%20Physics%20for%20Games/Car%20Physics%20for%20Games.html
-
-
-Source code references:
-
-https://github.com/spacejack/carphysics2d
+# Simplistic Car Physics 3D
+This project is a fork of [jongallant/CarSimulator](https://github.com/jongallant/CarSimulator). The sole purpose of this fork is to converse the original project from 2d to 3d.
