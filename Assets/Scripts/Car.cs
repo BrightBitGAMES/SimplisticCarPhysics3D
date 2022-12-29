@@ -2,6 +2,13 @@
 
 public class Car : MonoBehaviour
 {
+    // [SerializeField] private float CenterOfGravityOffset = -0.231f;
+
+    [Header("Wheel Positions")]
+    [SerializeField] private float WheelBase = 2.934201f;
+    [SerializeField] private float TrackWidth = 1.28f;
+
+    [Header("Misc")]
     [SerializeField] private bool IsPlayerControlled = false;
     [SerializeField] [Range(0f, 1f)] private float CGHeight = 0.55f;
     [SerializeField] [Range(0f, 2f)] private float InertiaScale = 1f;
@@ -32,12 +39,9 @@ public class Car : MonoBehaviour
     }
 
     // Variables that get initialized via code
-    private float Inertia    = 1;
-    private float WheelBase  = 1;
-    private float TrackWidth = 1;
+    private                  float Inertia    = 1;
 
     // Private vars
-    private float HeadingAngle;
     private float Speed;
     private float AngularVelocity;
     private float SteerDirection;
@@ -78,6 +82,8 @@ public class Car : MonoBehaviour
         Velocity = Vector3.zero;
         Speed    = 0;
 
+        // CenterOfGravityOffset = CenterOfGravity.transform.localPosition.z;
+
         // Dimensions
         AxleFront.DistanceToCG = Vector3.Distance(CenterOfGravity.transform.position, AxleFront.transform.position);
         AxleRear.DistanceToCG  = Vector3.Distance(CenterOfGravity.transform.position, AxleRear.transform.position);
@@ -87,9 +93,6 @@ public class Car : MonoBehaviour
 
         WheelBase = AxleFront.DistanceToCG + AxleRear.DistanceToCG;
         Inertia   = Rigidbody.mass * InertiaScale;
-
-        // Set starting angle of car
-        HeadingAngle = transform.rotation.eulerAngles.y * Mathf.Deg2Rad;
     }
 
     private void Start()
@@ -188,15 +191,11 @@ public class Car : MonoBehaviour
     private void FixedUpdate()
     {
         // Update from rigidbody to retain collision responses
-        Velocity     = Rigidbody.velocity;
-        HeadingAngle = transform.rotation.eulerAngles.y * Mathf.Deg2Rad;
-
-        var sin = Mathf.Sin(HeadingAngle);
-        var cos = Mathf.Cos(HeadingAngle);
+        Velocity = Rigidbody.velocity;
 
         // Get local velocity
-        LocalVelocity.z = cos * Velocity.z + sin * Velocity.x;
-        LocalVelocity.x = cos * Velocity.x - sin * Velocity.z;
+        var forwardSpeed = Vector3.Dot(transform.forward, Velocity);
+        var sideSpeed    = Vector3.Dot(transform.right, Velocity);
 
         // Weight transfer
         var transferLongitudinal = WeightTransfer * LocalAcceleration.z * CGHeight / WheelBase;
@@ -219,8 +218,8 @@ public class Car : MonoBehaviour
         AxleRear.TireRight.AngularVelocity  = -AxleRear.DistanceToCG * AngularVelocity;
 
         // Slip angle
-        AxleFront.SlipAngle = Mathf.Atan2(LocalVelocity.x + AxleFront.AngularVelocity, Mathf.Abs(LocalVelocity.z)) - Mathf.Sign(LocalVelocity.z) * SteerAngle;
-        AxleRear.SlipAngle  = Mathf.Atan2(LocalVelocity.x + AxleRear.AngularVelocity, Mathf.Abs(LocalVelocity.z));
+        AxleFront.SlipAngle = Mathf.Atan2(sideSpeed + AxleFront.AngularVelocity, Mathf.Abs(forwardSpeed)) - Mathf.Sign(forwardSpeed) * SteerAngle;
+        AxleRear.SlipAngle  = Mathf.Atan2(sideSpeed + AxleRear.AngularVelocity, Mathf.Abs(forwardSpeed));
 
         // Brake and Throttle power
         var activeBrake    = Mathf.Min(Brake * BrakePower + EBrake * EBrakePower, BrakePower);
@@ -242,11 +241,11 @@ public class Car : MonoBehaviour
         AxleRear.TireRight.FrictionForce  = Mathf.Clamp(-CornerStiffnessRear  * AxleRear.SlipAngle,  -AxleRear.TireRight.Grip,  AxleRear.TireRight.Grip)  * AxleRear.TireRight.ActiveWeight;
 
         // Forces
-        var   tractionForceZ = AxleRear.Torque - activeBrake * Mathf.Sign(LocalVelocity.z);
+        var   tractionForceZ = AxleRear.Torque - activeBrake * Mathf.Sign(forwardSpeed);
         float tractionForceX = 0;
 
-        var dragForceZ = -RollingResistance * LocalVelocity.z - AirResistance * LocalVelocity.z * Mathf.Abs(LocalVelocity.z);
-        var dragForceX = -RollingResistance * LocalVelocity.x - AirResistance * LocalVelocity.x * Mathf.Abs(LocalVelocity.x);
+        var dragForceZ = -RollingResistance * forwardSpeed - AirResistance * forwardSpeed * Mathf.Abs(forwardSpeed);
+        var dragForceX = -RollingResistance * sideSpeed    - AirResistance * sideSpeed    * Mathf.Abs(sideSpeed);
 
         var totalForceZ = dragForceZ + tractionForceZ;
         var totalForceX = dragForceX + tractionForceX + Mathf.Cos(SteerAngle) * AxleFront.FrictionForce + AxleRear.FrictionForce;
@@ -267,8 +266,7 @@ public class Car : MonoBehaviour
         LocalAcceleration.z = totalForceZ / Rigidbody.mass;
         LocalAcceleration.x = totalForceX / Rigidbody.mass;
 
-        Acceleration.z = cos * LocalAcceleration.z - sin * LocalAcceleration.x;
-        Acceleration.x = sin * LocalAcceleration.z + cos * LocalAcceleration.x;
+        Acceleration = transform.TransformVector(LocalAcceleration); // from local to global acceleration
 
         // Velocity and speed
         Velocity.z += Acceleration.z * Time.deltaTime;
@@ -306,17 +304,22 @@ public class Car : MonoBehaviour
             AngularVelocity = 0;
         }
 
-        HeadingAngle += AngularVelocity * Time.deltaTime;
-
         var oldVelocity = Rigidbody.velocity;
         var newVelocity = new Vector3(Velocity.x, oldVelocity.y, Velocity.z);
 
         var velocityDelta = newVelocity - oldVelocity;
 
-        var rotation = Quaternion.AngleAxis(Mathf.Rad2Deg * HeadingAngle, Vector3.up);
-
         Rigidbody.AddForce(velocityDelta, ForceMode.VelocityChange);
-        Rigidbody.MoveRotation(rotation);
+
+        // var angularVelocity = transform.up * AngularVelocity;
+        // Rigidbody.angularVelocity = angularVelocity;
+
+        var oldAngularVelocity = Rigidbody.angularVelocity;
+        var newAngularVelocity = transform.up * AngularVelocity;
+        
+        var angularVelocityDelta = newAngularVelocity - oldAngularVelocity;
+        
+        Rigidbody.AddTorque(angularVelocityDelta, ForceMode.VelocityChange);
     }
 
     private float SmoothSteering(float steerInput)
@@ -362,7 +365,6 @@ public class Car : MonoBehaviour
             GUI.Label(new Rect(5, 165, 300, 20), "Throttle: "          + Throttle.ToString());
             GUI.Label(new Rect(5, 185, 300, 20), "Brake: "             + Brake.ToString());
 
-            GUI.Label(new Rect(5, 205, 300, 20), "HeadingAngle: "    + HeadingAngle.ToString());
             GUI.Label(new Rect(5, 225, 300, 20), "AngularVelocity: " + AngularVelocity.ToString());
 
             GUI.Label(new Rect(5, 245, 300, 20), "TireFL Weight: " + AxleFront.TireLeft.ActiveWeight.ToString());
